@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph Session</title>
+    <style>
+      *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0e1210;color:#edf9f0;font-family:'Trebuchet MS',Tahoma,sans-serif;overflow:hidden}
+      canvas{position:fixed;inset:0;z-index:0}.hero{position:relative;z-index:1;width:min(94vw,760px);background:rgba(16,24,18,.88);border:1px solid rgba(54,155,95,.4);border-radius:22px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+      h1{margin:0 0 8px;font-size:2rem}.accent{color:#39ff14}p{margin:0 0 24px;color:#b5cbb9}.actions{display:flex;gap:12px;flex-wrap:wrap}
+      a{padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700}.primary{background:linear-gradient(135deg,#1a593a,#2db36e);color:#041008}.secondary{border:1px solid #369b5f;color:#a8deb6;background:transparent}
+      .custom-cursor{width:6px;height:6px;background:#369B5F;border-radius:50%;position:fixed;pointer-events:none;z-index:3;box-shadow:0 0 8px #369B5F}
+      @media (pointer:coarse){.custom-cursor{display:none}}
+    </style>
+  </head>
+  <body>
+    <div class="custom-cursor"></div>
+    <canvas id="bg"></canvas>
+    <main class="hero">
+      <h1><span class="accent">Graph</span> Session</h1>
+      <p>ورود سریع به جلسه یا ساخت اتاق جدید.</p>
+      <div class="actions">
+        <a class="primary" href="/create-room.html">ساخت روم</a>
+        <a class="secondary" href="/login.html">ورود به روم</a>
+      </div>
+    </main>
+    <script>
+      const c=document.getElementById('bg'),x=c.getContext('2d');let p=[];const m={x:null,y:null};const n=matchMedia('(pointer:coarse)').matches?70:140;
+      function rs(){c.width=innerWidth;c.height=innerHeight;p=Array.from({length:n},()=>({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*1.3+.4,vx:Math.random()*.5-.25,vy:Math.random()*.5-.25}))}
+      function d(){x.clearRect(0,0,c.width,c.height);for(let i=0;i<p.length;i++){const a=p[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;x.fillStyle='#39ff14';x.beginPath();x.arc(a.x,a.y,a.s,0,6.28);x.fill();for(let j=i+1;j<p.length;j++){const b=p[j],dx=a.x-b.x,dy=a.y-b.y,dist=Math.hypot(dx,dy);if(dist<84){x.strokeStyle='rgba(54,155,95,.28)';x.lineWidth=.4;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}} if(m.x!=null&&Math.hypot(a.x-m.x,a.y-m.y)<100){x.strokeStyle='rgba(57,255,20,.2)';x.beginPath();x.moveTo(a.x,a.y);x.lineTo(m.x,m.y);x.stroke();}} requestAnimationFrame(d)}
+      addEventListener('resize',rs);addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY;const cur=document.querySelector('.custom-cursor'); if(cur){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';}}); rs(); d();
+    </script>
+  </body>
+</html>

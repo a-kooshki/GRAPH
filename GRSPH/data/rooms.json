@@ -1,0 +1,92 @@
+[
+  {
+    "id": "room_1fb63ad58be3",
+    "code": "E1A9F5",
+    "title": "iran",
+    "ownerId": "usr_76c7991c860e",
+    "createdAt": "2026-04-02T20:58:43.654Z",
+    "participants": [
+      {
+        "sessionId": "ses_6b5efbf615d2",
+        "userId": "usr_76c7991c860e",
+        "name": "asdfg",
+        "joinedAt": "2026-04-02T21:04:24.617Z",
+        "lastActiveAt": "2026-04-02T21:05:24.684Z",
+        "authToken": "a9ebeee478d25b5f14a05910272ac66dffd1463f3ccb0747"
+      }
+    ],
+    "signals": []
+  },
+  {
+    "id": "room_8107d9a9b793",
+    "code": "E0999E",
+    "title": "irans1",
+    "passwordHash": "ea427a9f3aac0fd739185a42058af270:e43c785dadf1c1092338b19a3facf2c8be0b499bb26fc7802b0c18eade2f2d694aef4779f05b17f5e2c541295560e4852bed7a2cc6c7a250f3ca3c6af3c51574",
+    "ownerId": "usr_19f7865e8557",
+    "createdAt": "2026-04-03T01:37:58.762Z",
+    "participants": [
+      {
+        "sessionId": "ses_d7cf0fb53689",
+        "userId": "usr_19f7865e8557",
+        "name": "alireza",
+        "joinedAt": "2026-04-03T01:38:21.630Z",
+        "lastActiveAt": "2026-04-03T01:55:42.152Z",
+        "authToken": "32ae463ca332a16ad8bac6e42c9aa2df8815cc4a97fce15a",
+        "authIssuedAt": "2026-04-03T01:38:21.630Z",
+        "lastRotatedAt": "2026-04-03T01:53:22.208Z"
+      }
+    ],
+    "signals": []
+  },
+  {
+    "id": "room_9d0d7e11653a",
+    "code": "BF9FD9",
+    "title": "iran",
+    "passwordHash": "8621e083b8a2c6c1145858b217c2b297:a4fbcae55ba6587f02b7ec8bb8c82aad80ef7918045392723dc52ca09cdd53564705fba289e4d6fcc8b99a6d38048ee7ff57d72fefef688f2d3c1f939328af36",
+    "ownerId": "usr_19f7865e8557",
+    "createdAt": "2026-04-03T13:09:35.350Z",
+    "participants": [],
+    "signals": []
+  },
+  {
+    "id": "room_1a565309514f",
+    "code": "A09A8B",
+    "title": "iran",
+    "passwordHash": "73c41ec2b17e3114f08a06563bcf392d:45e5422f0cfc66e5e88ff5d343b6b5e112bea136e46309a54d3dc443c1fdd4ddc1dcbb0608cad33f95815dca2a7f3b563712903643d22a119cb408e5d26f567c",
+    "ownerId": "usr_19f7865e8557",
+    "createdAt": "2026-04-03T13:27:25.301Z",
+    "participants": [],
+    "signals": []
+  },
+  {
+    "id": "room_af658902d105",
+    "code": "0A7155",
+    "title": "irans",
+    "passwordHash": "e7ab1e373b14a7daa0c483b7cbe92b21:8f89b2354b87f451e5bb89a94cefc745cfe30a137cfd7bb6669fdac5c460b2c527e60e7be3abb57a73edca50c21368346aed1188ded757fde4fa11c80a61e951",
+    "ownerId": "usr_cd3fef2e835b",
+    "createdAt": "2026-04-03T14:06:37.917Z",
+    "participants": [],
+    "signals": []
+  },
+  {
+    "id": "room_74853e43a50a",
+    "code": "E41E40",
+    "title": "irans",
+    "passwordHash": "f93e16983b451cdf22d442d19d96ca6e:1e6207506b0c1dcd87b29fd7b8acbafbe058b6da09d22532277d97115651c8231eaec2981c0c71cf99a39ace09db7ec9dcadce4d442a04342cb7818b6f905005",
+    "ownerId": "usr_cd3fef2e835b",
+    "createdAt": "2026-04-03T14:06:57.245Z",
+    "participants": [],
+    "signals": []
+  },
+  {
+    "id": "room_6f46c63fc18f",
+    "code": "419DBB",
+    "title": "1irans",
+    "passwordHash": "4176846e8305dd483c4c44d4b47fd103:6019b7a0c3a09dc34f9c253a5bc20daf1ab2695f74d45e77765cc62e776096b07488d8f5d182fb2f58022b30b801754e07483526ea4bdf3d4982c889f86663a2",
+    "ownerId": "usr_76c7991c860e",
+    "joinLocked": false,
+    "createdAt": "2026-04-03T15:16:32.482Z",
+    "participants": [],
+    "signals": []
+  }
+]
