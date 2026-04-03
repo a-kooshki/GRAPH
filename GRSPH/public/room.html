@@ -3,34 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Graph HG | Session Room</title>
+    <title>Graph HG | Session</title>
     <style>
       :root{--bg:#0b0f0c;--panel:#131b15;--panel2:#17241b;--bd:#2e553b;--txt:#eef9f0;--mut:#9ab7a1;--acc:#38c172;--danger:#e85a5a}
-      *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#132118,#070b08 45%,#030503);color:var(--txt);font-family:'Trebuchet MS',Tahoma,sans-serif}
+      *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#132118,#070b08 45%,#030503);color:var(--txt);font-family:'Trebuchet MS',Tahoma,sans-serif;overflow-x:hidden}
+      canvas.bg{position:fixed;inset:0;z-index:-1}
+      .app-brand{position:fixed;top:16px;left:18px;z-index:4;font-weight:800;letter-spacing:.3px}.app-brand .g{color:#39ff14}.app-brand .s{color:#edf9f0}
       .connection-loader{position:fixed;inset:0;background:rgba(4,8,6,.75);display:grid;place-items:center;z-index:99} .hidden{display:none!important}
       .loader-card{background:var(--panel);border:1px solid var(--bd);padding:18px 22px;border-radius:14px;display:grid;gap:6px}
-      .room-shell{width:min(1380px,96vw);margin:16px auto;display:grid;grid-template-columns:340px 1fr;gap:14px}
+      .room-shell{width:min(1380px,96vw);margin:52px auto 16px;display:grid;grid-template-columns:340px 1fr;gap:14px}
       .card,.video-toolbar,.video-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid #284432;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
-      .sidebar{padding:16px;display:grid;gap:14px;height:calc(100vh - 32px);overflow:auto} h1,h2,p{margin:0} h2{font-size:1rem;color:#d1e9d8}
+      .sidebar{padding:16px;display:grid;gap:14px;height:calc(100vh - 68px);overflow:auto} h1,h2,p{margin:0} h2{font-size:1rem;color:#d1e9d8}
       .room-header{display:flex;justify-content:space-between;align-items:start;gap:10px} .badge{font-size:.72rem;border:1px solid #3f805a;color:#8cd7a7;padding:4px 8px;border-radius:999px;display:inline-block;margin-bottom:8px}
       button{border:none;border-radius:10px;padding:10px 12px;background:#2ca765;color:#fff;font-weight:700;cursor:pointer} button.secondary{background:transparent;border:1px solid #3f805a;color:#9ddcaf} button.ghost{background:#202a24;color:#d5e4da} button.danger{background:rgba(232,90,90,.2);color:#ffcece;border:1px solid rgba(232,90,90,.45)}
       .stack.compact{display:grid;gap:8px} .info-box,.invite-box{background:#101813;border:1px solid #243a2c;border-radius:12px;padding:10px;display:flex;justify-content:space-between;align-items:center;gap:8px} .info-box span,.invite-box span{color:var(--mut);font-size:.82rem}
       .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px} .controls button:nth-child(3), .controls button:nth-child(4){grid-column:span 2}
       .participant-list{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:7px} .participant-list li{background:#111912;border:1px solid #2a4232;padding:8px;border-radius:8px;font-size:.92rem}
       .messages{margin-top:8px;background:#0e1511;border:1px solid #223628;border-radius:12px;min-height:160px;max-height:240px;overflow:auto;padding:10px;display:grid;gap:8px}
-      .message{background:#17221b;border:1px solid #2b4333;border-radius:8px;padding:8px} .message .meta{display:flex;justify-content:space-between;color:var(--mut);font-size:.77rem;margin-bottom:4px}
+      .message{background:#17221b;border:1px solid #2b4333;border-radius:8px;padding:8px;display:grid;gap:6px} .message .meta{display:flex;justify-content:space-between;color:var(--mut);font-size:.77rem}
       .chat-form{margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:8px} input{background:#0e1511;color:#fff;border:1px solid #31503d;border-radius:10px;padding:10px}
-      .meeting-area{display:grid;grid-template-rows:auto 1fr;gap:10px;min-height:calc(100vh - 32px)} .video-toolbar{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+      .meeting-area{display:grid;grid-template-rows:auto 1fr;gap:10px;min-height:calc(100vh - 68px)} .video-toolbar{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
       .status-pill{padding:5px 10px;border-radius:999px;border:1px solid #496759;color:#b8d4c0;font-size:.8rem} .status-pill.success{border-color:#2ca765;color:#8ef0ae} .status-pill.warning{border-color:#e0a84f;color:#ffd898}
       .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;align-content:start} .video-card{position:relative;min-height:200px;overflow:hidden} .video-card video{width:100%;height:100%;object-fit:cover;background:#000}
-      .video-card.placeholder{display:grid;place-items:center;color:#9fb7a8;min-height:240px} .video-label{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.5);padding:5px 8px;border-radius:7px;font-size:.8rem}
+      .video-label{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.5);padding:5px 8px;border-radius:7px;font-size:.8rem}
       .toolbar-actions{display:flex;align-items:center;gap:8px} #connectionHint{color:var(--mut);margin-top:6px;font-size:.9rem} #inviteLinkText{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
       @media (max-width:980px){.room-shell{grid-template-columns:1fr} .sidebar,.meeting-area{height:auto;min-height:unset}}
     </style>
   </head>
   <body class="room-body">
+    <canvas id="bg" class="bg"></canvas>
+    <div class="app-brand"><span class="g">Graph</span><span class="s">/Session</span></div>
     <div id="connectionLoader" class="connection-loader">
-      <div class="loader-card"><strong>در حال برقراری اتصال جلسه...</strong><span>لطفاً چند لحظه صبر کنید.</span></div>
+      <div class="loader-card"><strong>در حال برقراری اتصال نشست...</strong><span>لطفاً چند لحظه صبر کنید.</span></div>
     </div>
     <div class="room-shell">
       <aside class="sidebar card">
@@ -43,10 +47,16 @@
         <section><h2>گفت‌وگو</h2><div id="messages" class="messages"></div><form id="chatForm" class="chat-form"><input id="chatInput" type="text" maxlength="400" placeholder="پیام خود را بنویسید..." required /><button type="submit">ارسال</button></form></section>
       </aside>
       <main class="meeting-area">
-        <section class="video-toolbar"><div><span class="badge">پخش زنده</span><h2>شبکه جلسه</h2><p id="connectionHint">در حال آماده‌سازی دوربین و میکروفون...</p></div><div class="toolbar-actions"><span id="secureStateBadge" class="status-pill">در حال بررسی اتصال</span><button id="openSecureBtn" class="ghost" hidden>نسخه امن</button></div></section>
-        <section id="videoGrid" class="video-grid"><article class="video-card local"><video id="localVideo" autoplay playsinline muted></video><div class="video-label">شما</div></article><article id="emptyRemoteState" class="video-card placeholder">منتظر ورود سایر شرکت‌کنندگان...</article></section>
+        <section class="video-toolbar"><div><span class="badge">پخش زنده</span><h2>شبکه نشست</h2><p id="connectionHint">در حال آماده‌سازی دوربین و میکروفون...</p></div><div class="toolbar-actions"><span id="secureStateBadge" class="status-pill">در حال بررسی اتصال</span><button id="openSecureBtn" class="ghost" hidden>نسخه امن</button></div></section>
+        <section id="videoGrid" class="video-grid"><article class="video-card local"><video id="localVideo" autoplay playsinline muted></video><div class="video-label">شما</div></article></section>
       </main>
     </div>
+    <script>
+      const c=document.getElementById('bg'),x=c.getContext('2d');let p=[];const m={x:null,y:null};const n=matchMedia('(pointer:coarse)').matches?70:120;
+      function rs(){c.width=innerWidth;c.height=innerHeight;p=Array.from({length:n},()=>({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*1.2+.4,vx:Math.random()*.45-.22,vy:Math.random()*.45-.22}))}
+      function d(){x.clearRect(0,0,c.width,c.height);for(let i=0;i<p.length;i++){const a=p[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;x.fillStyle='#39ff14';x.beginPath();x.arc(a.x,a.y,a.s,0,6.28);x.fill();for(let j=i+1;j<p.length;j++){const b=p[j],dx=a.x-b.x,dy=a.y-b.y,dist=Math.hypot(dx,dy);if(dist<82){x.strokeStyle='rgba(54,155,95,.25)';x.lineWidth=.4;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}} if(m.x!=null&&Math.hypot(a.x-m.x,a.y-m.y)<95){x.strokeStyle='rgba(57,255,20,.2)';x.beginPath();x.moveTo(a.x,a.y);x.lineTo(m.x,m.y);x.stroke();}} requestAnimationFrame(d)}
+      addEventListener('resize',rs);addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY}); rs(); d();
+    </script>
     <script>
 const params = new URLSearchParams(window.location.search);
 const sessionSeed = JSON.parse(sessionStorage.getItem("meetingSession") || "{}");
@@ -86,7 +96,6 @@ const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const localVideo = document.getElementById("localVideo");
 const videoGrid = document.getElementById("videoGrid");
-const emptyRemoteStateEl = document.getElementById("emptyRemoteState");
 const connectionHint = document.getElementById("connectionHint");
 const toggleAudioBtn = document.getElementById("toggleAudioBtn");
 const toggleVideoBtn = document.getElementById("toggleVideoBtn");
@@ -226,10 +235,7 @@ function setInviteLink() {
   inviteLinkText.title = inviteUrl;
 }
 
-function toggleEmptyRemoteState() {
-  const remoteCardsCount = videoGrid.querySelectorAll(".video-card[data-session-id]").length;
-  emptyRemoteStateEl.hidden = remoteCardsCount > 0;
-}
+function toggleEmptyRemoteState() {}
 
 async function ensureConfig() {
   if (!state.config) {
@@ -397,11 +403,17 @@ async function appendMessage(message, scroll = true) {
 
   const wrapper = document.createElement("div");
   wrapper.className = "message";
+  const metaEl = document.createElement("div");
+  metaEl.className = "meta";
   const senderEl = document.createElement("strong");
-  senderEl.textContent = message.sender;
+  senderEl.textContent = message.sender || "کاربر";
+  const timeEl = document.createElement("small");
+  const time = message.createdAt ? new Date(message.createdAt) : new Date();
+  timeEl.textContent = time.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
   const textEl = document.createElement("span");
   textEl.textContent = await decryptMessageText(message.text);
-  wrapper.append(senderEl, textEl);
+  metaEl.append(senderEl, timeEl);
+  wrapper.append(metaEl, textEl);
   messagesEl.appendChild(wrapper);
 
   if (scroll) {
@@ -426,7 +438,6 @@ function ensureRemoteCard(sessionId, name) {
   label.textContent = name;
   card.append(video, label);
   videoGrid.appendChild(card);
-  toggleEmptyRemoteState();
   return card.querySelector("video");
 }
 
@@ -435,7 +446,6 @@ function removeRemoteCard(sessionId) {
   if (card) {
     card.remove();
   }
-  toggleEmptyRemoteState();
 }
 
 async function setupLocalMedia(replaceActiveStream = false) {
@@ -466,7 +476,7 @@ async function setupLocalMedia(replaceActiveStream = false) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(attempt.constraints);
       if (replaceActiveStream) {
-        replaceOutgoingStream(stream);
+        replaceOutgoingStream(stream, { stopCurrentTracks: true });
       } else {
         state.localStream = stream;
         localVideo.srcObject = state.localStream;
@@ -768,18 +778,20 @@ async function refreshRoom() {
       }
     });
 
-    toggleEmptyRemoteState();
   } catch (error) {
     setHint(error.message);
   }
 }
 
-function replaceOutgoingStream(stream) {
-  state.localStream?.getTracks().forEach((track) => {
-    if (track.readyState !== "ended") {
-      track.stop();
-    }
-  });
+function replaceOutgoingStream(stream, options = {}) {
+  const { stopCurrentTracks = false } = options;
+  if (stopCurrentTracks) {
+    state.localStream?.getTracks().forEach((track) => {
+      if (track.readyState !== "ended") {
+        track.stop();
+      }
+    });
+  }
 
   state.localStream = stream;
   localVideo.srcObject = stream;
@@ -887,13 +899,23 @@ shareScreenBtn.addEventListener("click", async () => {
       audio: false
     });
 
+    const combinedStream = new MediaStream();
+    const screenTrack = state.screenStream.getVideoTracks()[0];
+    if (screenTrack) {
+      combinedStream.addTrack(screenTrack);
+    }
+    const micTrack = state.localStream?.getAudioTracks()[0];
+    if (micTrack && micTrack.readyState === "live") {
+      combinedStream.addTrack(micTrack);
+    }
+
     state.screenStream.getVideoTracks()[0].addEventListener("ended", async () => {
       state.screenStream = null;
       await setupLocalMedia(true);
       shareScreenBtn.textContent = "اشتراک صفحه";
     });
 
-    replaceOutgoingStream(state.screenStream);
+    replaceOutgoingStream(combinedStream);
     shareScreenBtn.textContent = "بازگشت به دوربین";
   } catch (error) {
     setHint(explainMediaError(error, "اشتراک صفحه"));

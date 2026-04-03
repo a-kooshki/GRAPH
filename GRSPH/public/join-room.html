@@ -23,21 +23,24 @@
       .status-success { color:#8ef0ae !important; }
       .custom-cursor { width:6px; height:6px; background:var(--accent); border-radius:50%; position:fixed; pointer-events:none; z-index:3; box-shadow:0 0 8px var(--accent); }
       @media (pointer:coarse){ .custom-cursor{display:none;} }
+      .app-brand{position:fixed;top:16px;left:18px;z-index:4;font-weight:800;letter-spacing:.3px}
+      .app-brand .g{color:#39ff14}.app-brand .s{color:#edf9f0}
     </style>
   </head>
   <body>
+    <div class="app-brand"><span class="g">Graph</span><span class="s">/Session</span></div>
     <div class="custom-cursor"></div>
     <canvas id="bg"></canvas>
     <main class="card">
       <h1>ورود به جلسه</h1>
       <p id="statusText"></p>
-      <form id="joinRoomForm" class="stack">
+      <form id="joinSessionForm" class="stack">
         <label>نام کاربری<input type="text" name="userName" required /></label>
-        <label>کد روم<input type="text" name="roomCode" maxlength="16" required /></label>
-        <label>رمز روم<input type="password" name="roomPassword" minlength="8" required /></label>
+        <label>کد نشست<input type="text" name="roomCode" maxlength="16" required /></label>
+        <label>رمز نشست<input type="password" name="roomPassword" minlength="8" required /></label>
         <div class="actions">
           <button type="submit">ورود</button>
-          <a class="link-btn" href="/create-room.html">ساخت روم جدید</a>
+          <a class="link-btn" href="/create-room.html">ساخت نشست جدید</a>
         </div>
       </form>
     </main>
@@ -48,7 +51,7 @@
       addEventListener('resize',rs);addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY;const cur=document.querySelector('.custom-cursor'); if(cur){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';}}); rs(); d();
     </script>
     <script>
-const form = document.getElementById("joinRoomForm");
+const form = document.getElementById("joinSessionForm");
 const statusText = document.getElementById("statusText");
 const params = new URLSearchParams(window.location.search);
 const roomCodeInput = form.elements.roomCode;
@@ -72,7 +75,7 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-async function deriveRoomKey(password, roomCode) {
+async function deriveSessionKey(password, roomCode) {
   const encoder = new TextEncoder();
   const baseKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, [
     "deriveKey"
@@ -119,7 +122,7 @@ form.addEventListener("submit", async (event) => {
   const roomCode = String(formData.get("roomCode") || "").trim().toUpperCase();
   const roomPassword = String(formData.get("roomPassword") || "").trim();
   if (roomPassword.length < 8) {
-    setStatus("رمز روم باید حداقل ۸ کاراکتر باشد.", "status-error");
+    setStatus("رمز نشست باید حداقل ۸ کاراکتر باشد.", "status-error");
     return;
   }
 
@@ -129,7 +132,7 @@ form.addEventListener("submit", async (event) => {
       method: "POST",
       body: JSON.stringify({ userName, roomCode, roomPassword })
     });
-    const roomKey = await deriveRoomKey(roomPassword, roomCode);
+    const roomKey = await deriveSessionKey(roomPassword, roomCode);
 
     sessionStorage.setItem(
       "meetingSession",

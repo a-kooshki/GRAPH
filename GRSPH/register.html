@@ -103,6 +103,8 @@
     color: #888888;
     
     }
+    .app-brand{position:fixed;top:16px;left:18px;z-index:4;font-weight:800;letter-spacing:.3px}
+    .app-brand .g{color:#39ff14}.app-brand .s{color:#edf9f0}
     .custom-cursor {
       width: 6px;
       height: 6px;
@@ -119,6 +121,7 @@
 
 </head>
 <body>
+  <div class="app-brand"><span class="g">Graph</span><span class="s">/Session</span></div>
   <div class="custom-cursor"></div>
   <canvas id="canvas"></canvas>
   <form class="register-box" method="POST" action="/register">

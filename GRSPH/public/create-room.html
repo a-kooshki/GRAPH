@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Graph HG | Create Room</title>
+    <title>Graph HG | Create Session</title>
     <style>
       :root { --accent:#369b5f; --accent-2:#2db36e; --bg:#0f1411; --panel:#1b1b1bcc; --text:#eef8f1; }
       *{box-sizing:border-box} body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Trebuchet MS',Tahoma,sans-serif;background:#121212;color:var(--text);overflow:hidden}
@@ -16,22 +16,25 @@
       #statusText{min-height:22px;margin:0 0 10px;text-align:center;font-size:.88rem;color:#fda4a4}.status-success{color:#8ef0ae!important}
       .custom-cursor{width:6px;height:6px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:3;box-shadow:0 0 8px var(--accent)}
       @media (pointer:coarse){.custom-cursor{display:none}}
+      .app-brand{position:fixed;top:16px;left:18px;z-index:4;font-weight:800;letter-spacing:.3px}
+      .app-brand .g{color:#39ff14}.app-brand .s{color:#edf9f0}
     </style>
   </head>
   <body>
+    <div class="app-brand"><span class="g">Graph</span><span class="s">/Session</span></div>
     <div class="custom-cursor"></div>
     <canvas id="bg"></canvas>
     <main class="card">
-      <h1>ساخت روم جدید</h1>
+      <h1>ساخت نشست جدید</h1>
       <p id="statusText"></p>
-      <form id="createRoomForm" class="stack">
+      <form id="createSessionForm" class="stack">
         <label>نام شما<input type="text" name="ownerName" required /></label>
-        <label>عنوان روم<input type="text" name="roomTitle" required /></label>
-        <label>رمز روم<input type="password" name="roomPassword" minlength="8" required /></label>
+        <label>عنوان نشست<input type="text" name="roomTitle" required /></label>
+        <label>رمز نشست<input type="password" name="roomPassword" minlength="8" required /></label>
         <label>کد دسترسی ۴ رقمی<input type="text" name="accessCode" minlength="4" maxlength="4" inputmode="numeric" required /></label>
         <div class="actions">
-          <button type="submit">ایجاد روم</button>
-          <a class="link-btn" href="/login.html">ورود به روم موجود</a>
+          <button type="submit">ایجاد نشست</button>
+          <a class="link-btn" href="/login.html">ورود به نشست موجود</a>
         </div>
       </form>
     </main>
@@ -42,7 +45,7 @@
       addEventListener('resize',rs);addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY;const cur=document.querySelector('.custom-cursor'); if(cur){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';}}); rs(); d();
     </script>
     <script>
-const form = document.getElementById("createRoomForm");
+const form = document.getElementById("createSessionForm");
 const statusText = document.getElementById("statusText");
 
 function setStatus(message, type = "") {
@@ -59,7 +62,7 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-async function deriveRoomKey(password, roomCode) {
+async function deriveSessionKey(password, roomCode) {
   const encoder = new TextEncoder();
   const baseKey = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
   const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: encoder.encode(`graph-room-${roomCode}`), iterations: 600_000, hash: "SHA-256" }, baseKey, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
@@ -81,16 +84,16 @@ form.addEventListener("submit", async (event) => {
   const roomTitle = String(formData.get("roomTitle") || "").trim();
   const roomPassword = String(formData.get("roomPassword") || "").trim();
   const accessCode = String(formData.get("accessCode") || "").replace(/\D/g, "").slice(0, 4);
-  if (roomPassword.length < 8) return setStatus("رمز روم باید حداقل ۸ کاراکتر باشد.", "status-error");
+  if (roomPassword.length < 8) return setStatus("رمز نشست باید حداقل ۸ کاراکتر باشد.", "status-error");
   if (accessCode.length !== 4) return setStatus("کد دسترسی ۴ رقمی معتبر نیست.", "status-error");
 
   try {
-    setStatus("در حال ساخت روم...");
+    setStatus("در حال ساخت نشست...");
     const data = await api("/api/rooms", { method: "POST", body: JSON.stringify({ ownerName, roomTitle, roomPassword, accessCode }) });
     const joinData = await api("/api/rooms/join", { method: "POST", body: JSON.stringify({ userName: ownerName, roomCode: data.room.code, roomPassword }) });
-    const roomKey = await deriveRoomKey(roomPassword, data.room.code);
+    const roomKey = await deriveSessionKey(roomPassword, data.room.code);
     sessionStorage.setItem("meetingSession", JSON.stringify({ roomCode: data.room.code, userName: ownerName, authToken: joinData.authToken, participantSessionId: joinData.participant?.sessionId, isOwner: Boolean(joinData.permissions?.isOwner), roomKey }));
-    setStatus(`روم ساخته شد. کد روم: ${data.room.code}`, "status-success");
+    setStatus(`نشست ساخته شد. کد نشست: ${data.room.code}`, "status-success");
     window.location.href = `/room.html?code=${encodeURIComponent(data.room.code)}`;
   } catch (error) {
     setStatus(error.message, "status-error");

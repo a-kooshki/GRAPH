@@ -36,7 +36,6 @@ const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const localVideo = document.getElementById("localVideo");
 const videoGrid = document.getElementById("videoGrid");
-const emptyRemoteStateEl = document.getElementById("emptyRemoteState");
 const connectionHint = document.getElementById("connectionHint");
 const toggleAudioBtn = document.getElementById("toggleAudioBtn");
 const toggleVideoBtn = document.getElementById("toggleVideoBtn");
@@ -176,10 +175,7 @@ function setInviteLink() {
   inviteLinkText.title = inviteUrl;
 }
 
-function toggleEmptyRemoteState() {
-  const remoteCardsCount = videoGrid.querySelectorAll(".video-card[data-session-id]").length;
-  emptyRemoteStateEl.hidden = remoteCardsCount > 0;
-}
+function toggleEmptyRemoteState() {}
 
 async function ensureConfig() {
   if (!state.config) {
@@ -347,11 +343,17 @@ async function appendMessage(message, scroll = true) {
 
   const wrapper = document.createElement("div");
   wrapper.className = "message";
+  const metaEl = document.createElement("div");
+  metaEl.className = "meta";
   const senderEl = document.createElement("strong");
-  senderEl.textContent = message.sender;
+  senderEl.textContent = message.sender || "کاربر";
+  const timeEl = document.createElement("small");
+  const time = message.createdAt ? new Date(message.createdAt) : new Date();
+  timeEl.textContent = time.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
   const textEl = document.createElement("span");
   textEl.textContent = await decryptMessageText(message.text);
-  wrapper.append(senderEl, textEl);
+  metaEl.append(senderEl, timeEl);
+  wrapper.append(metaEl, textEl);
   messagesEl.appendChild(wrapper);
 
   if (scroll) {
@@ -376,7 +378,6 @@ function ensureRemoteCard(sessionId, name) {
   label.textContent = name;
   card.append(video, label);
   videoGrid.appendChild(card);
-  toggleEmptyRemoteState();
   return card.querySelector("video");
 }
 
@@ -385,7 +386,6 @@ function removeRemoteCard(sessionId) {
   if (card) {
     card.remove();
   }
-  toggleEmptyRemoteState();
 }
 
 async function setupLocalMedia(replaceActiveStream = false) {
@@ -416,7 +416,7 @@ async function setupLocalMedia(replaceActiveStream = false) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(attempt.constraints);
       if (replaceActiveStream) {
-        replaceOutgoingStream(stream);
+        replaceOutgoingStream(stream, { stopCurrentTracks: true });
       } else {
         state.localStream = stream;
         localVideo.srcObject = state.localStream;
@@ -718,18 +718,20 @@ async function refreshRoom() {
       }
     });
 
-    toggleEmptyRemoteState();
   } catch (error) {
     setHint(error.message);
   }
 }
 
-function replaceOutgoingStream(stream) {
-  state.localStream?.getTracks().forEach((track) => {
-    if (track.readyState !== "ended") {
-      track.stop();
-    }
-  });
+function replaceOutgoingStream(stream, options = {}) {
+  const { stopCurrentTracks = false } = options;
+  if (stopCurrentTracks) {
+    state.localStream?.getTracks().forEach((track) => {
+      if (track.readyState !== "ended") {
+        track.stop();
+      }
+    });
+  }
 
   state.localStream = stream;
   localVideo.srcObject = stream;
@@ -837,13 +839,23 @@ shareScreenBtn.addEventListener("click", async () => {
       audio: false
     });
 
+    const combinedStream = new MediaStream();
+    const screenTrack = state.screenStream.getVideoTracks()[0];
+    if (screenTrack) {
+      combinedStream.addTrack(screenTrack);
+    }
+    const micTrack = state.localStream?.getAudioTracks()[0];
+    if (micTrack && micTrack.readyState === "live") {
+      combinedStream.addTrack(micTrack);
+    }
+
     state.screenStream.getVideoTracks()[0].addEventListener("ended", async () => {
       state.screenStream = null;
       await setupLocalMedia(true);
       shareScreenBtn.textContent = "اشتراک صفحه";
     });
 
-    replaceOutgoingStream(state.screenStream);
+    replaceOutgoingStream(combinedStream);
     shareScreenBtn.textContent = "بازگشت به دوربین";
   } catch (error) {
     setHint(explainMediaError(error, "اشتراک صفحه"));
